@@ -39,7 +39,6 @@ private:
       {
         tilt_left_time = millis();
         untilt_left_time = (unsigned long) 2000000000; 
-        Serial.println("FR1 tilted left!");
       }
     }
 
@@ -57,7 +56,6 @@ private:
       {
         tilt_right_time = millis();
         untilt_right_time = (unsigned long) 2000000000; 
-        Serial.println("FR1 tilted left!");
       }
     }
   }
@@ -115,13 +113,10 @@ public:
         if(!digitalRead(open_button)) {//open button pressed
           servo.write(SERVO_OPEN_ANGLE);
           state = STATE_UNLOAD;
-          Serial.println("Unload");
         }
         else {
           if((millis() > untilt_left_time + DEBOUNCE_TIME_MILLIS) && leftbutton) { //left button not pressed, and has been unpressed for DEBOUNCE_TIME_MILLIS
             state = STATE_NEUTRAL;
-            Serial.println("FR1 untilted left!");
-            Serial.println("STATE_NEUTRAL");
             prev_state = STATE_TILT_LEFT;
           }
           else {
@@ -134,13 +129,10 @@ public:
         if(!digitalRead(open_button)) {//open button pressed
           servo.write(SERVO_OPEN_ANGLE);
           state = STATE_UNLOAD;
-          Serial.println("Unload");
         }
         else {
           if((millis() > untilt_right_time + DEBOUNCE_TIME_MILLIS)) {
             state = STATE_NEUTRAL;
-            Serial.println("FR1 untilted right!");
-            Serial.println("STATE_NEUTRAL");
             prev_state = STATE_TILT_RIGHT;
           }
           else{
@@ -157,8 +149,6 @@ public:
         if(!digitalRead(open_button)) {//open button pressed
           servo.write(SERVO_OPEN_ANGLE);
           state = STATE_UNLOAD;
-          Serial.println("Unload");
-          Serial.println("STATE_UNLOAD");
         }
         else {
           if(!digitalRead(tilt_right_button) && (millis() > tilt_right_time + BOUNCE_TIME_MILLIS)) { //is currently tilted to the right, and the last change to the right was BOUNCE_TIME_MILLIS ago
@@ -168,7 +158,6 @@ public:
               servo_open = 1;
             }
             state = STATE_TILT_RIGHT;
-            Serial.println("STATE_TILT_RIGHT");
           }
           else if(!digitalRead(tilt_left_button) && (millis() > tilt_left_time + BOUNCE_TIME_MILLIS)) { //is currently tilted to the left, and the last change to the left was BOUNCE_TIME_MILLIS ago
             if((prev_state == STATE_TILT_RIGHT) || (prev_state == STATE_START)) {
@@ -177,7 +166,6 @@ public:
               servo_open = 1;
             }
             state = STATE_TILT_LEFT;
-            Serial.println("STATE_TILT_LEFT");
           }
           check_servo_timer();
         }
@@ -186,8 +174,6 @@ public:
       case STATE_UNLOAD:
         if(digitalRead(open_button)) { //open button released
           servo.write(SERVO_CLOSE_ANGLE);
-          Serial.println("End Unload, Reset system");
-          Serial.println("STATE_START");
 
           state = STATE_START;
           prev_state = STATE_START;
