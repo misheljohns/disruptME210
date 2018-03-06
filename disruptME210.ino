@@ -45,10 +45,10 @@ void loop() {
 
   /*
    * Beacons:
-   * FRA beacon always on, 950 Hz. D.C: 50% neutral, 25% losing, 75% winning
-   * FRB beacon on after FRA tipped once, 1350 Hz, D.C: 50% neutral, 25% losing, 75% winning
+   * FRA beacon always on, 950 Hz. D.C: 25% losing, 50% neutral,  75% winning //1 25% , 2 50% ,3 75%
+   * FRB beacon on after FRA tipped once, 1350 Hz, D.C: 25% losing, 50% neutral, 75% winning//11 25%,12 50%,13 75% ,14 off, 15 on
    * Startup Incubator beacon always on, 3500 Hz
-   * Gate on when FRB & (FRA | PO), 4125 Hz
+   * Gate on when FRB & (FRA | PO), 4125 Hz //21 off , 22 on
    */
 
 
