@@ -34,7 +34,7 @@ const int FR2_open_button = 17;
 const int PO_tilt_left_button = 15;
 const int PO_tilt_right_button = 14;
 
-const int gate_right_servo_pin = 20;
+const int gate_right_servo_pin = 22;
 const int gate_left_servo_pin = 21;
 
 #endif

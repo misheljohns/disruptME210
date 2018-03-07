@@ -15,16 +15,16 @@ private:
 public:
   side(int gate_servo_pin_in, byte fra_o, byte frb_o, byte g_o):
 	gate_servo_pin(gate_servo_pin_in),
-  frA_offset(fra_o),
-  frB_offset(frb_o),
-  gate_offset(g_o)
+	frA_offset(fra_o),
+	frB_offset(frb_o),
+	gate_offset(g_o)
   {
 	
   }
   
   void setup()
   {
-	  servo.attach(gate_servo_pin, 1000, 2000); //adjust pulse width (microsecs)
+	servo.attach(gate_servo_pin, 1000, 2000); //adjust pulse width (microsecs)
     servo.write(GATE_CLOSE_ANGLE);
     state = STATE_SIDE_START;
   }
