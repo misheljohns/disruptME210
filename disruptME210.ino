@@ -12,14 +12,16 @@ funding_round fr1(FR1_tilt_left_button,FR1_tilt_right_button,FR1_servo_pin,FR1_o
 funding_round fr2(FR2_tilt_left_button,FR2_tilt_right_button,FR2_servo_pin,FR2_open_button);
 patent_office po(PO_tilt_left_button,PO_tilt_right_button);
 
-side left_side(gate_left_servo_pin, 20, 40, 60);
-side right_side(gate_right_servo_pin, 40, 20, 0);
+side left_side(gate_left_servo_pin, 20, 40, 60, 15, 140, 147);
+side right_side(gate_right_servo_pin, 40, 20, 0, 15, 130, 135);
 
 void setup() {
   
   pinMode(LEDPIN,OUTPUT);
   digitalWrite(LEDPIN, HIGH);
 
+  for(int i = 0; i <= 80000000; i++);//80million cycles?
+  
   setupbeacons();
   
   fr1.setup();

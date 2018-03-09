@@ -9,8 +9,7 @@ const int SERVO_CLOSE_DELAY = 1000; //close the door 1000 ms after it was opened
 
 const int LEDPIN = 13;
 
-const int GATE_OPEN_ANGLE = 55;
-const int GATE_CLOSE_ANGLE = 140;
+const int GATE_INTERMEDIATE_DELAY = 100;//delay ata intermediate position while closing so it doesn't slam into the field
 
 typedef enum {
   STATE_TILT_RIGHT, STATE_TILT_LEFT, STATE_NEUTRAL, STATE_UNLOAD, STATE_START

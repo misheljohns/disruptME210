@@ -11,22 +11,30 @@ private:
    side_states state;
    const byte frA_offset,frB_offset, gate_offset;
    int frA_tipped_t, frB_tipped_t;
+   const int gate_open_angle;
+   const int gate_intermediate_angle;
+   const int gate_close_angle;
+   unsigned long gate_intermed_time;
    
 public:
-  side(int gate_servo_pin_in, byte fra_o, byte frb_o, byte g_o):
+  side(int gate_servo_pin_in, byte fra_o, byte frb_o, byte g_o, int gate_open_angle_in, int gate_intermediate_angle_in, int gate_close_angle_in):
 	gate_servo_pin(gate_servo_pin_in),
 	frA_offset(fra_o),
 	frB_offset(frb_o),
-	gate_offset(g_o)
+	gate_offset(g_o),
+  gate_open_angle(gate_open_angle_in),
+  gate_intermediate_angle(gate_intermediate_angle_in),
+  gate_close_angle(gate_close_angle_in)
   {
 	
   }
   
   void setup()
   {
-	servo.attach(gate_servo_pin, 1000, 2000); //adjust pulse width (microsecs)
-    servo.write(GATE_CLOSE_ANGLE);
+	  servo.attach(gate_servo_pin, 1000, 2000); //adjust pulse width (microsecs)
+    servo.write(gate_close_angle);
     state = STATE_SIDE_START;
+    gate_intermed_time = (unsigned long) 2000000000; 
   }
   
   void update(int frA_tipped, int frB_tipped, int po_tipped)
@@ -45,13 +53,20 @@ public:
       break;
       
       case STATE_A_COMPLETE: 
+        if(millis() > gate_intermed_time + GATE_INTERMEDIATE_DELAY)
+        {
+          servo.write(gate_close_angle);
+          gate_intermed_time = (unsigned long) 2000000000; 
+        }
         if((frB_tipped == 1) && ((frA_tipped == 1)|(po_tipped == 1))) //conditions met for gate open!
         {
           //open gate (change state)
-          servo.write(GATE_OPEN_ANGLE);
+          servo.write(gate_open_angle);
+          gate_intermed_time = (unsigned long) 2000000000; 
           state = STATE_GATE_OPEN;
           //turn on gate beacon
           Serial1.print((char)(frB_offset + 7));
+          Serial.println("Gate open");
         }
       break;
       
@@ -60,10 +75,12 @@ public:
         if(!((frB_tipped == 1) && ((frA_tipped == 1)|(po_tipped == 1)))) //lost a bin!
         {
           //close gate
-          servo.write(GATE_CLOSE_ANGLE);
+          servo.write(gate_intermediate_angle);
+          gate_intermed_time = millis();
           state = STATE_A_COMPLETE;
           //turn on gate beacon
           Serial1.print((char)(frB_offset + 7));
+          Serial.println("Gate close");
         }
       break;
       default:    // Should never get into an unhandled state
