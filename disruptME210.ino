@@ -4,25 +4,26 @@
 #include "patentoffice.h"
 #include "side.h"
 
-//teetertotter_states FR1_state;
-//teetertotter_states FR2_state;
-//teetertotter_states PO_state;
+/*
+ * todo:
+ * gate resistor
+ * button open for gates x2
+ * button open FR x2 done
+ * change state_unload open for gates to independent gate open so we can override in the middle  of a game if necessary
+ * reset after round if all 4 buttons flipped
+ */
 
-funding_round fr1(FR1_tilt_left_button,FR1_tilt_right_button,FR1_servo_pin,FR1_open_button);
-funding_round fr2(FR2_tilt_left_button,FR2_tilt_right_button,FR2_servo_pin,FR2_open_button);
+funding_round fr1(FR1_tilt_left_button,FR1_tilt_right_button,FR1_servo_pin,FR1_open_button); //FRA for left side
+funding_round fr2(FR2_tilt_left_button,FR2_tilt_right_button,FR2_servo_pin,FR2_open_button); //FRB for left side
 patent_office po(PO_tilt_left_button,PO_tilt_right_button);
 
-side left_side(gate_left_servo_pin, 20, 40, 60, 15, 140, 147);
-side right_side(gate_right_servo_pin, 40, 20, 0, 15, 130, 135);
+side left_side(gate_left_servo_pin, gate_left_open_pin, 20, 40, 60, 15, 130, 135, 'L');
+side right_side(gate_right_servo_pin, gate_right_open_pin, 40, 20, 0, 15, 140, 147, 'R');
 
 void setup() {
   
   pinMode(LEDPIN,OUTPUT);
   digitalWrite(LEDPIN, HIGH);
-
-  for(int i = 0; i <= 80000000; i++);//80million cycles?
-  
-  setupbeacons();
   
   fr1.setup();
   fr2.setup();
@@ -33,6 +34,9 @@ void setup() {
   
   Serial.begin(9600); //debug print
   Serial1.begin(9600); //beacon control
+
+  for(int i = 0; i <= 80000000; i++); //80million cycles ~ 1s
+  setupbeacons();
 }
 
 void loop() {
@@ -45,8 +49,8 @@ void loop() {
   left_side.update((fr1.get_state() == STATE_TILT_LEFT)? 1 : (fr1.get_state() == STATE_TILT_RIGHT)? -1 : 0,
                    (fr2.get_state() == STATE_TILT_LEFT)? 1 : (fr2.get_state() == STATE_TILT_RIGHT)? -1 : 0,
                    (po.get_state() == STATE_TILT_LEFT)? 1 : (po.get_state() == STATE_TILT_RIGHT)? -1 : 0);
-  right_side.update((fr1.get_state() == STATE_TILT_RIGHT)? 1 : (fr1.get_state() == STATE_TILT_LEFT)? -1 : 0,
-                    (fr2.get_state() == STATE_TILT_RIGHT)? 1 : (fr2.get_state() == STATE_TILT_LEFT)? -1 : 0,
+  right_side.update((fr2.get_state() == STATE_TILT_RIGHT)? 1 : (fr2.get_state() == STATE_TILT_LEFT)? -1 : 0,
+                    (fr1.get_state() == STATE_TILT_RIGHT)? 1 : (fr1.get_state() == STATE_TILT_LEFT)? -1 : 0,
                     (po.get_state() == STATE_TILT_RIGHT)? 1 : (po.get_state() == STATE_TILT_LEFT)? -1 : 0);
 
 }
@@ -54,22 +58,22 @@ void loop() {
 void setupbeacons()
 {
   //gate_right
-  Serial1.print((char) 0 + 6);//switch off top half
-  Serial1.print((char) 0 + 8);//switch off bot half
+  Serial1.write((char) 0 + 6);//switch off top half
+  Serial1.write((char) 0 + 8);//switch off bot half
 
   //FRA_Left
-  Serial1.print((char) 20 + 7);//switch on top half
-  Serial1.print((char) 20 + 1);//top half at 50% DC
-  Serial1.print((char) 20 + 8);//switch off bot half
+  Serial1.write((char) 20 + 7);//switch on top half
+  Serial1.write((char) 20 + 1);//top half at 50% DC
+  Serial1.write((char) 20 + 8);//switch off bot half
 
   //FRB_Left
-  Serial1.print((char) 40 + 7);//switch on top half
-  Serial1.print((char) 40 + 1);//top half at 50% DC
-  Serial1.print((char) 40 + 8);//switch off bot half
+  Serial1.write((char) 40 + 7);//switch on top half
+  Serial1.write((char) 40 + 1);//top half at 50% DC
+  Serial1.write((char) 40 + 8);//switch off bot half
   
   //gate_left
-  Serial1.print((char) 60 + 6);//switch off left half
-  Serial1.print((char) 60 + 8);//switch off right half
+  Serial1.write((char) 60 + 6);//switch off left half
+  Serial1.write((char) 60 + 8);//switch off right half
 }
 
 /*

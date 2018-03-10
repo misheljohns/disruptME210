@@ -6,7 +6,8 @@
 class side
 {
 private:              
-   const int gate_servo_pin;    
+   const int gate_servo_pin;
+   const int gate_open_pin;    
    Servo servo;
    side_states state;
    const byte frA_offset,frB_offset, gate_offset;
@@ -15,18 +16,21 @@ private:
    const int gate_intermediate_angle;
    const int gate_close_angle;
    unsigned long gate_intermed_time;
+   const char sidename;
    
 public:
-  side(int gate_servo_pin_in, byte fra_o, byte frb_o, byte g_o, int gate_open_angle_in, int gate_intermediate_angle_in, int gate_close_angle_in):
+  side(int gate_servo_pin_in, int gate_open_pin_in, byte fra_o, byte frb_o, byte g_o, int gate_open_angle_in, int gate_intermediate_angle_in, int gate_close_angle_in, char sidename_in):
 	gate_servo_pin(gate_servo_pin_in),
+  gate_open_pin(gate_open_pin_in),
 	frA_offset(fra_o),
 	frB_offset(frb_o),
 	gate_offset(g_o),
   gate_open_angle(gate_open_angle_in),
   gate_intermediate_angle(gate_intermediate_angle_in),
-  gate_close_angle(gate_close_angle_in)
+  gate_close_angle(gate_close_angle_in),
+  sidename(sidename_in)
   {
-	
+	  
   }
   
   void setup()
@@ -47,8 +51,9 @@ public:
         {
           state = STATE_A_COMPLETE;
           //turn on frB beacon at a DC based on the state
-          Serial1.print((char)(frB_offset + 9));
-          Serial1.print((char)(frB_offset + 4 + frB_tipped));
+          Serial1.write((char)(frB_offset + 9));
+          Serial.print(sidename);
+          Serial.println(" A complete");
         }
       break;
       
@@ -65,8 +70,9 @@ public:
           gate_intermed_time = (unsigned long) 2000000000; 
           state = STATE_GATE_OPEN;
           //turn on gate beacon
-          Serial1.print((char)(frB_offset + 7));
-          Serial.println("Gate open");
+          Serial1.write((char)(gate_offset + 7));
+          Serial.print(sidename);
+          Serial.println(" Gate open");
         }
       break;
       
@@ -78,11 +84,13 @@ public:
           servo.write(gate_intermediate_angle);
           gate_intermed_time = millis();
           state = STATE_A_COMPLETE;
-          //turn on gate beacon
-          Serial1.print((char)(frB_offset + 7));
-          Serial.println("Gate close");
+          //turn off gate beacon
+          Serial1.write((char)(gate_offset + 6));
+          Serial.print(sidename);
+          Serial.println(" Gate close");
         }
       break;
+      
       default:    // Should never get into an unhandled state
         Serial.println("What is this I do not even...");
     }
@@ -90,12 +98,16 @@ public:
     //change duty cycles when flipped, in all states
     if(frA_tipped != frA_tipped_t)
     {
-      Serial1.print((char)(frA_offset + 1 + frA_tipped));
+      Serial1.write((char)(frA_offset + 1 - frA_tipped)); //edited
+      Serial.print(sidename);
+      Serial.println(" FRA_change");
       frA_tipped_t = frA_tipped;
     }
     if(frB_tipped_t != frB_tipped)
     {
-      Serial1.print((char)(frB_offset + 4 + frB_tipped));
+      Serial1.write((char)(frB_offset + 4 - frB_tipped)); //edited
+      Serial.print(sidename);
+      Serial.println(" FRB_change");
       frB_tipped_t = frB_tipped;
     }
   }
