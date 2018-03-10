@@ -7,14 +7,15 @@
 class funding_round
 {
 private: 
-  teetertotter_states state;
   const int tilt_left_button;
   const int tilt_right_button;
   const int servo_pin;
   const int open_button;
-  
-  teetertotter_states prev_state; //previous side before it got to neutral
+
   Servo servo;
+  
+  teetertotter_states state;
+  teetertotter_states prev_state; //previous side before it got to neutral
   unsigned long tilt_left_time;
   unsigned long tilt_right_time;
   unsigned long untilt_left_time;
@@ -94,14 +95,16 @@ public:
     
     state = STATE_START;
     prev_state = STATE_START;
-    servo.write(SERVO_CLOSE_ANGLE);
-    servo_open = 0;
     tilt_left_time = (unsigned long) 2000000000; //2000000000 ~ half of max value 4294967295 ms = ~23 days
     tilt_right_time = (unsigned long) 2000000000;
     untilt_left_time = (unsigned long) 2000000000; 
     untilt_right_time = (unsigned long) 2000000000; 
-    leftbutton = 0;
-    rightbutton = 0;
+    servo_open_time = (unsigned long) 2000000000; 
+    leftbutton = true;
+    rightbutton = true;
+    
+    servo.write(SERVO_CLOSE_ANGLE);
+    servo_open = 0;
   }
 
   void update()

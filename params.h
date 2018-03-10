@@ -23,19 +23,23 @@ typedef enum {
 const int FR1_tilt_left_button = 8;
 const int FR1_tilt_right_button = 7;
 const int FR1_servo_pin = 6;
-const int FR1_open_button = 11;
+const int FR1_open_button = 4;
 
 const int FR2_tilt_left_button = 18;
 const int FR2_tilt_right_button = 19;
 const int FR2_servo_pin = 20;
-const int FR2_open_button = 17;
+const int FR2_open_button = 5;
 
 const int PO_tilt_left_button = 14;
 const int PO_tilt_right_button = 15;
 
 const int gate_right_servo_pin = 10;
-const int gate_right_open_pin = A9;
+const int gate_right_sensor_pin = A9;
 const int gate_left_servo_pin = 9;
-const int gate_left_open_pin = A2;
+const int gate_left_sensor_pin = A2;
+
+const int gate_left_open_button = 17;
+const int gate_right_open_button = 11;
+
 
 #endif

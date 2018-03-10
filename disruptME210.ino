@@ -9,7 +9,8 @@
  * gate resistor
  * button open for gates x2
  * button open FR x2 done
- * change state_unload open for gates to independent gate open so we can override in the middle  of a game if necessary
+ * gate sensor to stop gate_close - todo
+ * change state_unload open for bins to door open so we can override in the middle of a game if necessary
  * reset after round if all 4 buttons flipped
  */
 
@@ -17,8 +18,8 @@ funding_round fr1(FR1_tilt_left_button,FR1_tilt_right_button,FR1_servo_pin,FR1_o
 funding_round fr2(FR2_tilt_left_button,FR2_tilt_right_button,FR2_servo_pin,FR2_open_button); //FRB for left side
 patent_office po(PO_tilt_left_button,PO_tilt_right_button);
 
-side left_side(gate_left_servo_pin, gate_left_open_pin, 20, 40, 60, 15, 130, 135, 'L');
-side right_side(gate_right_servo_pin, gate_right_open_pin, 40, 20, 0, 15, 140, 147, 'R');
+side left_side(gate_left_servo_pin, gate_left_open_button, gate_left_sensor_pin, 20, 40, 60, 15, 130, 135, 'L');
+side right_side(gate_right_servo_pin, gate_right_open_button, gate_right_sensor_pin, 40, 20, 0, 15, 140, 147, 'R');
 
 void setup() {
   
