@@ -7,11 +7,12 @@
 /*
  * todo:
  * gate resistor
- * button open for gates x2
+ * button open for gates x2 done
  * button open FR x2 done
- * gate sensor to stop gate_close - todo
+ * gate sensor to stop gate_close - todo - Kirsten/Gabby?
  * change state_unload open for bins to door open so we can override in the middle of a game if necessary
- * reset after round if all 4 buttons flipped
+ * reset after round if all 4 buttons flipped then unflipped - done
+ * 
  */
 
 funding_round fr1(FR1_tilt_left_button,FR1_tilt_right_button,FR1_servo_pin,FR1_open_button); //FRA for left side
@@ -21,11 +22,16 @@ patent_office po(PO_tilt_left_button,PO_tilt_right_button);
 side left_side(gate_left_servo_pin, gate_left_open_button, gate_left_sensor_pin, 20, 40, 60, 15, 130, 135, 'L');
 side right_side(gate_right_servo_pin, gate_right_open_button, gate_right_sensor_pin, 40, 20, 0, 15, 140, 147, 'R');
 
+bool waiting_for_reset = false;
+
 void setup() {
   
   pinMode(LEDPIN,OUTPUT);
-  digitalWrite(LEDPIN, HIGH);
+  digitalWrite(LEDPIN, LOW);
   
+  Serial.begin(9600); //debug print
+  Serial1.begin(9600); //beacon control
+
   fr1.setup();
   fr2.setup();
   po.setup();
@@ -33,26 +39,54 @@ void setup() {
   left_side.setup();
   right_side.setup();
   
-  Serial.begin(9600); //debug print
-  Serial1.begin(9600); //beacon control
-
   for(int i = 0; i <= 80000000; i++); //80million cycles ~ 1s
   setupbeacons();
+  
+  digitalWrite(LEDPIN, HIGH);
 }
 
 void loop() {
 
-  fr1.update(); //check inputs and control servo to open the door
-  fr2.update();
-  po.update(); //check inputs
-
-  //1 if tipped in your favour, 0 if neutral, -1 if against you
-  left_side.update((fr1.get_state() == STATE_TILT_LEFT)? 1 : (fr1.get_state() == STATE_TILT_RIGHT)? -1 : 0,
-                   (fr2.get_state() == STATE_TILT_LEFT)? 1 : (fr2.get_state() == STATE_TILT_RIGHT)? -1 : 0,
-                   (po.get_state() == STATE_TILT_LEFT)? 1 : (po.get_state() == STATE_TILT_RIGHT)? -1 : 0);
-  right_side.update((fr2.get_state() == STATE_TILT_RIGHT)? 1 : (fr2.get_state() == STATE_TILT_LEFT)? -1 : 0,
-                    (fr1.get_state() == STATE_TILT_RIGHT)? 1 : (fr1.get_state() == STATE_TILT_LEFT)? -1 : 0,
-                    (po.get_state() == STATE_TILT_RIGHT)? 1 : (po.get_state() == STATE_TILT_LEFT)? -1 : 0);
+  if(waiting_for_reset)
+  {
+    if(digitalRead(FR1_open_button) && digitalRead(FR2_open_button) && digitalRead(gate_left_open_button) && digitalRead(gate_right_open_button)) //all of them are unflipped
+    {
+      //reset when everything is unflipped
+      waiting_for_reset = false;
+      
+      digitalWrite(LEDPIN, LOW);
+      
+      fr1.setup();
+      fr2.setup();
+      po.setup();
+    
+      left_side.setup();
+      right_side.setup();
+      
+      for(int i = 0; i <= 80000000; i++); //80million cycles ~ 1s
+      setupbeacons();
+      
+      digitalWrite(LEDPIN, HIGH);
+    }
+  }
+  else
+  {
+    if(!(digitalRead(FR1_open_button) || digitalRead(FR2_open_button) || digitalRead(gate_left_open_button) || digitalRead(gate_right_open_button))) //none of them are unflipped
+    {
+      waiting_for_reset = true;
+    }//finish the loop so the system responds to the command by opening doors and gates
+    fr1.update(); //check inputs and control servo to open the door
+    fr2.update();
+    po.update(); //check inputs
+  
+    //1 if tipped in your favour, 0 if neutral, -1 if against you
+    left_side.update((fr1.get_state() == STATE_TILT_LEFT)? 1 : (fr1.get_state() == STATE_TILT_RIGHT)? -1 : 0,
+                     (fr2.get_state() == STATE_TILT_LEFT)? 1 : (fr2.get_state() == STATE_TILT_RIGHT)? -1 : 0,
+                     (po.get_state() == STATE_TILT_LEFT)? 1 : (po.get_state() == STATE_TILT_RIGHT)? -1 : 0);
+    right_side.update((fr2.get_state() == STATE_TILT_RIGHT)? 1 : (fr2.get_state() == STATE_TILT_LEFT)? -1 : 0,
+                      (fr1.get_state() == STATE_TILT_RIGHT)? 1 : (fr1.get_state() == STATE_TILT_LEFT)? -1 : 0,
+                      (po.get_state() == STATE_TILT_RIGHT)? 1 : (po.get_state() == STATE_TILT_LEFT)? -1 : 0);
+  }
 
 }
 

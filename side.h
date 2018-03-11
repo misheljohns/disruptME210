@@ -68,6 +68,10 @@ public:
           Serial.print(sidename);
           Serial.println(" A complete");
         }
+        if((!digitalRead(gate_open_pin))) //manual override, shouldn't really ever happen in this state because A hasn't been tipped yet
+        {
+          servo.write(gate_open_angle);
+        }
       break;
       
       case STATE_A_COMPLETE: 
